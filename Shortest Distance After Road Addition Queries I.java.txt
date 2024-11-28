@@ -1,0 +1,51 @@
+//https://leetcode.com/problems/shortest-distance-after-road-addition-queries-i/description/
+class Solution {
+    public int[] shortestDistanceAfterQueries(int n, int[][] queries) {
+        List<List<Integer>> grph = createGraph(n, queries);
+        int len = queries.length;
+        int[] ans = new int[len];
+        int i = 0;
+        for(int[] query : queries)
+        {
+            int src = query[0];
+            int des = query[1];
+            grph.get(src).add(des);
+            ans[i++] = shortestDist(n, grph, src);
+        }
+        return ans;
+    }
+    private int shortestDist(int n, List<List<Integer>> grph, int src)
+    {
+        int[] dis = new int[n];
+        Arrays.fill(dis, (int)1e8);
+        dis[0] = 0;
+        Queue<Integer> qu = new LinkedList<>();
+        qu.offer(0);
+        while(!qu.isEmpty())
+        {
+            int cur = qu.poll();
+            for(int nei : grph.get(cur))
+            {
+            //    System.out.println(nei+":"+cur);
+                if(dis[cur] + 1 < dis[nei])
+                {
+                    dis[nei] = dis[cur] + 1;
+                    qu.offer(nei);
+                }
+            }
+        }
+      //  System.out.println("__________");
+        return dis[n - 1];
+    }
+
+    private List<List<Integer>> createGraph(int n, int[][] queries)
+    {
+        List<List<Integer>> graph = IntStream.range(0, n)
+                            .mapToObj(i -> new ArrayList<Integer>())
+                            .collect(Collectors.toList());
+
+        IntStream.range(0, n - 1).forEach(i -> graph.get(i).add(i + 1));
+
+        return graph;
+    }
+}
